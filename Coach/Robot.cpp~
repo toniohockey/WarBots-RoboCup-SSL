@@ -202,6 +202,11 @@ bool Robot::Prepare(float x1, float y1,float vel, float x2, float y2){
 	float angle = 9999999;
 	float R = sqrt((yDiff*yDiff)+(xDiff*xDiff));
 
+	if(sqrt(pow((y - y1),2)) < 200 && sqrt(pow((x - x1),2)) > 300){
+		Move(x,y+300,1);
+		usleep(1000*1000);
+	}
+
 	if(R > 50){
 		angle = acos(-xDiff/R);
 		if(yDiff < 0)
