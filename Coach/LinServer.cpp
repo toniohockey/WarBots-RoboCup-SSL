@@ -524,7 +524,7 @@ void* SocketHandler(void* lp){
 
 	
 
-	Ybots[4].Prepare(ball.x(),ball.y(),1,3200,0);
+	Ybots[4].Prepare(ball.x(),ball.y(),1,3025,0);
 
 
 
