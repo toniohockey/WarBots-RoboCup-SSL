@@ -18,6 +18,7 @@ SOURCES += LinServer.cpp\
 	pb/grSim_Commands.pb.cc \
 	pb/grSim_Packet.pb.cc \
 	Robot.cpp \
+	Goalie.cpp
 
 INCLUDEPATH += include
 LIBS += -Llibs/ -lprotobuf-2.4.0\

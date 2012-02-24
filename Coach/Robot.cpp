@@ -46,7 +46,7 @@ void Robot::Move(float x1, float y1, float vel){
 	float angle = 9999999;
 	float R = sqrt((yDiff*yDiff)+(xDiff*xDiff));
 	
-	if(R > 50){
+	if(R > 25){
 		angle = acos(xDiff/R);
 		if(yDiff < 0)
 			angle = 2*PI - angle;
