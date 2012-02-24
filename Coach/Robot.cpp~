@@ -235,7 +235,7 @@ bool Robot::Prepare(float x1, float y1,float vel, float x2, float y2){
 	{
 		Move(x1,y1,1);
 		Kick(5);
-		usleep(1200*1000);
+		usleep(1500*1000);
 	}
 		
 }
