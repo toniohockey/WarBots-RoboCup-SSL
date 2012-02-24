@@ -5,6 +5,8 @@ SocketApp: Arduino code for wireless communications
 	-TimerOne: http://code.google.com/p/arduino-timerone
 	-WiShield: https://github.com/linksprite/ZG2100BasedWiFiShield
 
+Driver: TCP client to send command to the SocketApp at runtime
+
 Coach: AI Code for controlling the Robots
 	Server Client requires:
 	-Google Protobuf: http://code.google.com/p/protobuf/
