@@ -30,8 +30,6 @@ Goalie::Goalie(int id_in, bool yellow_in):Robot::Robot (id_in, yellow_in){
 //x1, y1 = coordinate of ball
 void Goalie::Defend(float x1, float y1){
 
-	Move(3025,0,20);
-	Rotate(3.14);
 	float y2 = ((y1)/(x1-3200))*(2800-x1) + y1;
 	Kick(3.5);
 	float xDiff = x1 - 3000;
@@ -43,8 +41,16 @@ void Goalie::Defend(float x1, float y1){
 		angle += 2*PI;
 
 	//Center of goal, deep end (3200, 0)
+	if(sqrt(pow(angle-orientation,2)) < .05 && velT == 0 && velN == 0 && x1 > 2600 && x1 < 2900 && y1 > -350 && y1 < 350){
+		velT = 3;
+		velN = 0;
+		velA = 0;
+		Kick(3);
+		usleep(800*1000);
+		velT = 0;
+	}
 	
-	if (y2 < 375 && y2 > -375)
+	if (y2 < 375 && y2 > -375 && velT != 3 && x1 < 3000)
 	{
 		
 		Move(2900,y2,1.2);
@@ -55,10 +61,10 @@ void Goalie::Defend(float x1, float y1){
 		//else
 			//Move(2900,y2+50,1);
 		
-		Rotate(angle + 0.05);
+		Rotate(angle);
 	}
 	
-	else
+	else if(velT !=3 && x1 < 3000)
 	{
 		if (y2 < -375)
 		{ 
@@ -72,9 +78,9 @@ void Goalie::Defend(float x1, float y1){
 			Rotate(0.75*PI);
 		}
 	}
-	if(sqrt(pow(angle-orientation,2)) < .05 && velT == 0 && velN == 0 && x1 > 2600 && x1 < 2900 && y1 > -350 && y1 < 350){
-		Move(x1,y1,1);
-		usleep(800*1000);
+
+	if(x1 > 3000){
+		Move(2900,0,1.2);
 	}
 	
 }

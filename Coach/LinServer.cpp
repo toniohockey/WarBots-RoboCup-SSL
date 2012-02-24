@@ -31,17 +31,21 @@
 Robot Ybots [5];
 Robot Bbots [5];
 int count = 0;
-int newCount = 0;
-bool ready;
+bool ready = true;
 
 
 void centerBall(){
 	grSim_Packet packet;	
 
 	grSim_BallReplacement* replace = packet.mutable_replacement()->mutable_ball();
+	int x1 = rand();
+	int y1 = rand();
 	
-	replace->set_x(0);
-	replace->set_y(0);
+	double x = (double(x1%5000) + -2500.0)/1000.0;
+	double y = (double(y1%3000) + -1500.0)/1000.0;
+	
+	replace->set_x(x);
+	replace->set_y(y);
 	replace->set_vx(0);
 	replace->set_vy(0);
 
@@ -186,9 +190,12 @@ void* SocketHandler(void* lp){
 	printf("\nRobot id %d, x: %f, y: %f, orientation: %f",i,x,y,orientation);
     }
 
-	if(ball.x() > 3000 || ball.x() < -3000 || ball.y() > 2000 || ball.y() < -2000)
-		centerBall();
-	
+	if(ball.x() > 3000 || ball.x() < -3000 || ball.y() > 2000 || ball.y() < -2000){
+		sleep(3);
+		if(ball.x() > 3000 || ball.x() < -3000 || ball.y() > 2000 || ball.y() < -2000){
+			centerBall();
+		}
+	}
 
 	//updates info for all bots
 	for(int i = 0; i < 5; i++){
