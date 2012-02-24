@@ -20,6 +20,10 @@
 #define TICKER_MAX 64
 #define TICKER_STEP 4
 
+int prevFL = 0;
+int prevFR = 0;
+int prevBK = 0;
+
 //-- May have to tweak the timer
 int timerDelay = 300;
 
@@ -88,6 +92,10 @@ void allOn(){
 
 void setMotors(int motor1, int motor2, int motor3)
 {
+  prevFL = motor1;
+  prevFR = motor2;
+  prevBK = motor3;
+  
   pwmWrite(1,255);
   pwmWrite(3,255);
   pwmWrite(5,255);
@@ -160,7 +168,22 @@ prog_uchar wep_keys[] PROGMEM = {	0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08
 								};
 
 void stopMovement(){
+   //reverse direction to stop stray wheels
+   setMotors(-prevFL, -prevFR, -prevBK);
+   delay(10);  //might want to replace this delay
    setMotors(0, 0, 0);
+}
+
+void moveMotors(int m1, int m2, int m3){
+                        Serial.print("motor1: ");
+                        Serial.println(m1);
+                        
+                        Serial.print("motor2: ");
+                        Serial.println(m2);
+                        
+                        Serial.print("motor3: ");
+                        Serial.println(m3);
+                        setMotors(m1,m2,m3);
 }
 
 void rotate(double spd){
@@ -180,6 +203,12 @@ void runInstr(){
         stopMovement();
     }
 }
+
+float cross_product(float*vec1,float*vec2)
+{
+  return vec1[0]*vec2[1] - vec1[1]*vec2[0];
+}
+
 
 void process_message(){
                
@@ -226,83 +255,39 @@ void process_message(){
     		case 1:
     			//move: send motor speeds
     			//arguments = {v, v_dir (radians), roller, 0}
-    			
-                        //div up the work
-                        //axis one(60 deg): +ve 0 -ve
-                        //axis two(180 deg): -ve +ve 0
-                        //axis three(300 deg): 0 -ve +ve
-                        
-                        /*
-                        * dir = dir % 2pi
-                        * if dir < 2pi / 3 or > 5pi / 3
-                        *    axis 1 + 2
-                        * else if dir < pi
-                        *    axis 2 + 3
-                        * else if dir < 5pi / 3
-                        *    axis 3 + 1
-                        *
-                        * v1 = v cos(dir)
-                        * v2 = v*cos(pi - dir)
-                        */
-                        
+                        stopMovement();
+                        double v, dir;
                         v = arguments[0];
-                        dir = fmod(arguments[1], (2*PI));                        
-                        theta = dir;
+                        dir = arguments[1];
                         
-                        if((dir < PI/3) || (dir >= 5*PI/3)){
-                            if (dir <= 2*PI/3){
-                              theta = 2*PI + dir;
-                            }
-                            Serial.println("in range 1 + 2");
-                            Serial.println(theta);
-                            Serial.println(5*PI/3);
-                            Serial.println(theta - 5*PI/3);
-                            theta = theta - 5*PI/3;
-                        }
-                        else if(dir < PI){
-                            Serial.println("in range 2 + 3");
-                            Serial.println(theta);
-                            Serial.println(PI/3);
-                            Serial.println(theta - PI/3);
-                            theta = theta - PI/3;
-                        }
-                        else{ //dir < 5*PI/3
-                            Serial.println("in range 3 + 1");
-                            Serial.println(theta);
-                            Serial.println(PI);
-                            Serial.println(theta - PI);
-                            theta = theta - PI;
-                        }
-                                                
-                        v1 = v * cos(theta);
-                        v2 = v * cos(PI - theta);
+                        float posM1[2]; posM1[0] = 0.5; posM1[1] = 0.866;
+                        float posM2[2]; posM2[0] = -1; posM2[1] = 0;
+                        float posM3[2]; posM3[0] = 0.5; posM3[1] = -0.866;
                         
-                        Serial.print("drive: v = ");
-    			Serial.print(arguments[0]);
-                        Serial.print(" v_dir = ");
-                        Serial.print(arguments[1]);
-                        Serial.print(" roller speed = ");
-                        Serial.print(arguments[2]);
+                        float newVel[2]; newVel[0] = v*cos(dir); newVel[1] = v*sin(dir);
                         
-                        Serial.print(" theta = ");
-    			Serial.print(theta);
-                        Serial.print(" v1 = ");
-    			Serial.print(v1);
-                        Serial.print(" v2 = ");
-                        Serial.println(v2);
+                        int tempScalar; tempScalar = 255;
                         
-                        if((dir < PI/3) || (dir >= 5*PI/3)){
-                            INSTR = instruction(v1, 0, -v1, -v2, v2, 0);
-                        }
-                        else if(dir < PI){
-                            INSTR = instruction(-v1, v1, 0, 0, -v2, v2);
-                        }
-                        else{ //dir < 5*PI/3
-                            INSTR = instruction(0, -v1, v1, v2, 0, -v2);
-                        }
-                            
-                        useInstr = true;
-
+                        int motor1; motor1 = int(tempScalar*v*cross_product(posM1,newVel));
+                        int motor2; motor2 = int(tempScalar*v*cross_product(posM2,newVel));
+                        int motor3; motor3 = int(tempScalar*v*cross_product(posM3,newVel));
+                        
+                        Serial.print("motor1: ");
+                        Serial.println(motor1);
+                        
+                        Serial.print("motor2: ");
+                        Serial.println(motor2);
+                        
+                        Serial.print("motor3: ");
+                        Serial.println(motor3);
+                        
+                        Serial.print("v: ");
+                        Serial.print(v);
+                        Serial.print("\t dir: ");
+                        Serial.println(dir);
+                        
+                        moveMotors(motor1,motor2,motor3);
+                        
     			break;
     		case 2:
     			//rotate: +ve is counterclockwise
@@ -355,9 +340,5 @@ void setup()
 void loop()
 {
         process_message();
-        
-        if(useInstr)
-            runInstr();
-
 	WiFi.run();
 }
