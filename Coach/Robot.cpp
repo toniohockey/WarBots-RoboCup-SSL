@@ -202,8 +202,18 @@ bool Robot::Prepare(float x1, float y1,float vel, float x2, float y2){
 	float angle = 9999999;
 	float R = sqrt((yDiff*yDiff)+(xDiff*xDiff));
 
-	if(sqrt(pow((y - y1),2)) < 200 && x1 < x){
-		Move(x,y+300,1);
+	if(sqrt(pow(y1-y,2)) < 200 && x1 < x){
+		if(y1 > y){
+			Move(x,y-300,1);
+			usleep(1000*1000);
+		}
+		else{
+			Move(x,y+300,1);
+			usleep(1000*1000);
+		}
+	}
+	else if(sqrt(pow(x1-x,2)) < 200 && x1 < x){
+		Move(x-300,y-300,1);
 		usleep(1000*1000);
 	}
 
@@ -221,23 +231,36 @@ bool Robot::Prepare(float x1, float y1,float vel, float x2, float y2){
 	printf("\nAngle to shoot is: %f",angle);
 	new_x = new_xDiff + x1;
 	new_y = new_yDiff + y1;
+	float diff = angle - orientation;
 
-	R = sqrt(pow((x - new_x),2)+pow((y-new_y),2));
-	Kick(0);	
+	
+
+	if(sqrt(pow(diff,2)) < 0.05 && velT == 0 && velN == 0 && sqrt(pow(velA,2)) < 0.05)
+	{
+		velT = 5;
+		velN = 0;
+		velA = 0;
+		Kick(5);
+		usleep(600*1000);
+		Move(new_x,new_y,1);
+	}
+	if(velT != 5){
+		Move(new_x,new_y,1);
+	}
+	if(abs(new_x - x) < 50){
+		Rotate(angle);
+	}
+
+	R = sqrt(pow((x - new_x),2)+pow((y-new_y),2));	
+	/*
 	if(abs(new_x - x) < 50){
 		Move(x,new_y,1); 
 		Rotate(angle);
 	}
 	else{
 		Move(new_x,y, 1);
-	}
-	float diff = angle - orientation;
-	if(sqrt(pow(diff,2)) < 0.1 && velT == 0 && velN == 0)
-	{
-		Move(x1,y1,1.25);
-		Kick(5);
-		usleep(3000*1000);
-	}
+	}*/
+	
 		
 }
 
