@@ -11,7 +11,7 @@
 #include <math.h>
 #include <TimerOne.h>
 
-#define PI 3.14159265
+#define PI 3.141592654
 
 #define WIRELESS_MODE_INFRA	1
 #define WIRELESS_MODE_ADHOC	2
@@ -116,19 +116,19 @@ class instruction{
     
     instruction(double a1, double a2, double a3){
        compound = false;
-       FL1 = a1;
-       FR1 = a2;
-       BK1 = a3;
+       FL1 = 255 * a1;
+       FR1 = 255 * a2;
+       BK1 = 255 * a3;
     }
     
     instruction(double a11, double a21, double a31, double a12, double a22, double a32){
        compound = true;
-       FL1 = a11;
-       FR1 = a21;
-       BK1 = a31;
-       FL2 = a12;
-       FR2 = a22;
-       BK2 = a32;
+       FL1 = 255 * a11;
+       FR1 = 255 * a21;
+       BK1 = 255 * a31;
+       FL2 = 255 * a12;
+       FR2 = 255 * a22;
+       BK2 = 255 * a32;
     }
     
     instruction(){
@@ -174,9 +174,9 @@ void runInstr(){
     }
     else{
         setMotors(INSTR.FL1, INSTR.FR1, INSTR.BK1);
-        delay(500);
+        delay(100);
         setMotors(INSTR.FL2, INSTR.FR2, INSTR.BK2);
-        delay(500);
+        delay(100);
         stopMovement();
     }
 }
@@ -209,7 +209,7 @@ void process_message(){
     
         useInstr = false;
         double v;
-        double dir;
+        double dir, theta;
         double v1;
         double v2;
         
@@ -226,13 +226,7 @@ void process_message(){
     		case 1:
     			//move: send motor speeds
     			//arguments = {v, v_dir (radians), roller, 0}
-    			Serial.print("drive: v = ");
-    			Serial.print(arguments[0]);
-                        Serial.print(" v_dir = ");
-                        Serial.print(arguments[1]);
-                        Serial.print(" roller speed = ");
-                        Serial.println(arguments[2]);
-
+    			
                         //div up the work
                         //axis one(60 deg): +ve 0 -ve
                         //axis two(180 deg): -ve +ve 0
@@ -252,17 +246,58 @@ void process_message(){
                         */
                         
                         v = arguments[0];
-                        dir = fmod(arguments[1], (2*PI));
-                        v1 = v * cos(dir);
-                        v2 = v * cos(PI - dir);
+                        dir = fmod(arguments[1], (2*PI));                        
+                        theta = dir;
                         
-                        if((dir <= 2*PI/3) || (dir > 5*PI/3)){
+                        if((dir < PI/3) || (dir >= 5*PI/3)){
+                            if (dir <= 2*PI/3){
+                              theta = 2*PI + dir;
+                            }
+                            Serial.println("in range 1 + 2");
+                            Serial.println(theta);
+                            Serial.println(5*PI/3);
+                            Serial.println(theta - 5*PI/3);
+                            theta = theta - 5*PI/3;
+                        }
+                        else if(dir < PI){
+                            Serial.println("in range 2 + 3");
+                            Serial.println(theta);
+                            Serial.println(PI/3);
+                            Serial.println(theta - PI/3);
+                            theta = theta - PI/3;
+                        }
+                        else{ //dir < 5*PI/3
+                            Serial.println("in range 3 + 1");
+                            Serial.println(theta);
+                            Serial.println(PI);
+                            Serial.println(theta - PI);
+                            theta = theta - PI;
+                        }
+                                                
+                        v1 = v * cos(theta);
+                        v2 = v * cos(PI - theta);
+                        
+                        Serial.print("drive: v = ");
+    			Serial.print(arguments[0]);
+                        Serial.print(" v_dir = ");
+                        Serial.print(arguments[1]);
+                        Serial.print(" roller speed = ");
+                        Serial.print(arguments[2]);
+                        
+                        Serial.print(" theta = ");
+    			Serial.print(theta);
+                        Serial.print(" v1 = ");
+    			Serial.print(v1);
+                        Serial.print(" v2 = ");
+                        Serial.println(v2);
+                        
+                        if((dir < PI/3) || (dir >= 5*PI/3)){
                             INSTR = instruction(v1, 0, -v1, -v2, v2, 0);
                         }
-                        else if(dir <= PI){
+                        else if(dir < PI){
                             INSTR = instruction(-v1, v1, 0, 0, -v2, v2);
                         }
-                        else{ //dir <= 5*PI/3
+                        else{ //dir < 5*PI/3
                             INSTR = instruction(0, -v1, v1, v2, 0, -v2);
                         }
                             
