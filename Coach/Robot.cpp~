@@ -46,7 +46,7 @@ void Robot::Move(float x1, float y1, float vel){
 	float angle = 9999999;
 	float R = sqrt((yDiff*yDiff)+(xDiff*xDiff));
 	
-	if(R > 50){
+	if(R > 25){
 		angle = acos(xDiff/R);
 		if(yDiff < 0)
 			angle = 2*PI - angle;
@@ -202,7 +202,7 @@ bool Robot::Prepare(float x1, float y1,float vel, float x2, float y2){
 	float angle = 9999999;
 	float R = sqrt((yDiff*yDiff)+(xDiff*xDiff));
 
-	if(sqrt(pow((y - y1),2)) < 200 && sqrt(pow((x - x1),2)) > 300){
+	if(sqrt(pow((y - y1),2)) < 200 && x1 < x){
 		Move(x,y+300,1);
 		usleep(1000*1000);
 	}
@@ -222,7 +222,8 @@ bool Robot::Prepare(float x1, float y1,float vel, float x2, float y2){
 	new_x = new_xDiff + x1;
 	new_y = new_yDiff + y1;
 
-	R = sqrt(pow((x - new_x),2)+pow((y-new_y),2));	
+	R = sqrt(pow((x - new_x),2)+pow((y-new_y),2));
+	Kick(0);	
 	if(abs(new_x - x) < 50){
 		Move(x,new_y,1); 
 		Rotate(angle);
@@ -233,9 +234,9 @@ bool Robot::Prepare(float x1, float y1,float vel, float x2, float y2){
 	float diff = angle - orientation;
 	if(sqrt(pow(diff,2)) < 0.1 && velT == 0 && velN == 0)
 	{
-		Move(x1,y1,1);
+		Move(x1,y1,1.25);
 		Kick(5);
-		usleep(1500*1000);
+		usleep(2000*1000);
 	}
 		
 }

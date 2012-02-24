@@ -34,14 +34,19 @@ void Goalie::Defend(float x1, float y1){
 	Rotate(3.14);
 	float y2 = ((y1)/(x1-3200))*(2800-x1) + y1;
 	Kick(3.5);
-	
+	float xDiff = x1 - 3000;
+	float yDiff = y1 - y2;
+	float angle = atan (yDiff/xDiff);
+	if(xDiff < 0)
+		angle = PI + angle;
+	if(xDiff > 0 && yDiff < 0)
+		angle += 2*PI;
 
 	//Center of goal, deep end (3200, 0)
 	
 	if (y2 < 375 && y2 > -375)
 	{
-		float xDiff = x1 - 3000;
-		float yDiff = y1 - y2;
+		
 		Move(2900,y2,1.2);
 		
 		//if (yDiff > 0)
@@ -49,12 +54,6 @@ void Goalie::Defend(float x1, float y1){
 		
 		//else
 			//Move(2900,y2+50,1);
-		
-		float angle = atan (yDiff/xDiff);
-		if(xDiff < 0)
-			angle = PI + angle;
-		if(xDiff > 0 && yDiff < 0)
-			angle += 2*PI;
 		
 		Rotate(angle + 0.05);
 	}
@@ -72,6 +71,10 @@ void Goalie::Defend(float x1, float y1){
 			Move(2950,350,1);
 			Rotate(0.75*PI);
 		}
+	}
+	if(sqrt(pow(angle-orientation,2)) < .05 && velT == 0 && velN == 0 && x1 > 2600 && x1 < 2900 && y1 > -350 && y1 < 350){
+		Move(x1,y1,1);
+		usleep(800*1000);
 	}
 	
 }

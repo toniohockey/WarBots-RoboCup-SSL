@@ -35,7 +35,26 @@ int newCount = 0;
 bool ready;
 
 
+void centerBall(){
+	grSim_Packet packet;	
 
+	grSim_BallReplacement* replace = packet.mutable_replacement()->mutable_ball();
+	
+	replace->set_x(0);
+	replace->set_y(0);
+	replace->set_vx(0);
+	replace->set_vy(0);
+
+	
+	std::string s;
+    	packet.SerializeToString(&s);
+	Net::UDP udpsocket;
+	Net::Address _addr;
+	_addr.setHost("127.0.0.1",20011);
+	udpsocket.open();
+    	udpsocket.send((void*) s.c_str(), s.length(), _addr);
+}
+	
 void* SocketHandler(void*);
 
 int main(int argv, char** argc){
@@ -167,7 +186,8 @@ void* SocketHandler(void* lp){
 	printf("\nRobot id %d, x: %f, y: %f, orientation: %f",i,x,y,orientation);
     }
 
-
+	if(ball.x() > 3000 || ball.x() < -3000 || ball.y() > 2000 || ball.y() < -2000)
+		centerBall();
 	
 
 	//updates info for all bots
