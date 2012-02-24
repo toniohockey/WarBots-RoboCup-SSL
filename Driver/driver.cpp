@@ -118,11 +118,11 @@ int main(int argc, char *argv[])
 				break;
 			case 122:
 				//msg = (char*)"z\n";
-				msg = (char*)"2 1 1\n";
+				msg = (char*)"2 0.5 1\n";
 				break;
 			case 120:
 				//msg = (char*)"x\n";
-				msg = (char*)"2 -1 1\n";
+				msg = (char*)"2 -0.5 1\n";
 				break;
 			case 32:
 				//msg = (char*)"space\n";
