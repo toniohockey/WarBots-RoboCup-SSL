@@ -28,8 +28,8 @@
 #define goalie_y1 370
 #define goalie_y2 -380
 
-Robot Ybots [5];
-Robot Bbots [5];
+Robot* Ybots [5];
+Robot* Bbots [5];
 int count = 0;
 bool ready = true;
 
@@ -44,8 +44,8 @@ void centerBall(){
 	double x = (double(x1%5000) + -2500.0)/1000.0;
 	double y = (double(y1%3000) + -1500.0)/1000.0;
 	
-	replace->set_x(0);
-	replace->set_y(0);
+	replace->set_x(x);
+	replace->set_y(y);
 	replace->set_vx(0);
 	replace->set_vy(0);
 
@@ -56,7 +56,7 @@ void centerBall(){
 	Net::Address _addr;
 	_addr.setHost("127.0.0.1",20011);
 	udpsocket.open();
-    	udpsocket.send((void*) s.c_str(), s.length(), _addr);
+    	udpsocket.send((void*) s.data(), s.size(), _addr);
 }
 	
 void* SocketHandler(void*);
@@ -64,8 +64,8 @@ void* SocketHandler(void*);
 int main(int argv, char** argc){
 
 	for(int i = 0; i < 5; i++){
-		Ybots[i] = Robot(i, true);
-		Bbots[i] = Robot(i, false);
+		Ybots[i] = new Robot(i, true);
+		Bbots[i] = new Robot(i, false);
 	}	
 	ready = false;
 
@@ -199,13 +199,13 @@ void* SocketHandler(void* lp){
 
 	//updates info for all bots
 	for(int i = 0; i < 5; i++){
-		Ybots[i].Update(&packetFrame);
-		Bbots[i].Update(&packetFrame);
+		Ybots[i]->Update(&packetFrame);
+		Bbots[i]->Update(&packetFrame);
 	}
 
 	for(int i = 0; i < 4; i++){
-		Ybots[i].Teleport(10,10);
-		Bbots[i].Teleport(10,10);
+		Ybots[i]->Teleport(10,10);
+		Bbots[i]->Teleport(10,10);
 	}
 
 	//Ybots[4].Move(1000,1000,1);
@@ -215,10 +215,10 @@ void* SocketHandler(void* lp){
 
 	
 	
-	Ybots[4].Prepare(ball.x(),ball.y(),1,3025,0);
-	Goalie test = Goalie(4,false);
-	test.Update(&packetFrame);
-	test.Defend(ball.x(),ball.y());
+	Bbots[4]->Prepare(ball.x(),ball.y(),1,3025,0);
+	Ybots[4] = new Goalie(4,true);
+	static_cast<Goalie*>(Ybots[4])->Update(&packetFrame);
+	static_cast<Goalie*>(Ybots[4])->Defend(ball.x(),ball.y());
 	//static_cast<Goalie>(Bbots[4]).Defend( ball.x(), ball.y());
 
 
