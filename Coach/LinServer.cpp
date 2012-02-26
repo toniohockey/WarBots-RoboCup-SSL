@@ -187,7 +187,7 @@ void* SocketHandler(void* lp){
 	float x = packetR.x();
 	float y = packetR.y();
 	float orientation = packetR.orientation();
-	printf("\nRobot id %d, x: %f, y: %f, orientation: %f",i,x,y,orientation);
+	printf("\nRobot B id %d, x: %f, y: %f, orientation: %f",i,x,y,orientation);
     }
 	
 	if(ball.x() > 3000 || ball.x() < -3000 || ball.y() > 2000 || ball.y() < -2000){
@@ -196,6 +196,22 @@ void* SocketHandler(void* lp){
 			centerBall();
 		}
 	}
+	for(int i = 0; i < packet.detection().robots_yellow_size(); i++){
+	SSL_DetectionRobot packetR;
+	packetR = packet.detection().robots_yellow(i);
+	float x = packetR.x();
+	float y = packetR.y();
+	float orientation = packetR.orientation();
+	printf("\nRobot Y id %d, x: %f, y: %f, orientation: %f",i,x,y,orientation);
+    }
+	
+	if(ball.x() > 3000 || ball.x() < -3000 || ball.y() > 2000 || ball.y() < -2000){
+		sleep(3);
+		if(ball.x() > 3000 || ball.x() < -3000 || ball.y() > 2000 || ball.y() < -2000){
+			centerBall();
+		}
+	}
+
 
 	//updates info for all bots
 	for(int i = 0; i < 5; i++){

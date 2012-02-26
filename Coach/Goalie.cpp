@@ -24,8 +24,14 @@
 #include "Goalie.h"
 #define PI 3.14159265 
 
+
+
+
 Goalie::Goalie(int id_in, bool yellow_in):Robot::Robot (id_in, yellow_in){
 }
+
+//This function 
+
 
 //x1, y1 = coordinate of ball
 void Goalie::Defend(float x1, float y1){
@@ -84,10 +90,3 @@ void Goalie::Defend(float x1, float y1){
 	}
 	
 }
-
-
-
-
-
-
-

@@ -30,10 +30,6 @@ Goalie::Goalie(int id_in, bool yellow_in):Robot::Robot (id_in, yellow_in){
 //x1, y1 = coordinate of ball
 void Goalie::Defend(float x1, float y1){
 
-	if(x1 < 3000){
-		Move(3025,0,20);
-		Rotate(3.14);
-	}
 	float y2 = ((y1)/(x1-3200))*(2800-x1) + y1;
 	Kick(3.5);
 	float xDiff = x1 - 3000;

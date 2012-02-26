@@ -27,7 +27,7 @@ killall -q -e grSim
 if [ "$response" = "y" ]; then
 	checkFile
 	if make; then
-		./server_30015 > logS.txt&
+		./server_30015 &
 		cd ../grSim/bin
 		./grSim > logG.txt&
 		echo "Press \"q\" then Enter to quit the programs"

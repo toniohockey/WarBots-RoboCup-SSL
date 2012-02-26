@@ -140,12 +140,15 @@ void Robot::PathTo(float x1, float y1, float vel){
 	if(R > 0){
 	for(int i = 0; i < current->robots_yellow_size(); i++){
 		SSL_DetectionRobot robot = current->robots_yellow(i);
-		if(yellow && id!=i){
-		if(interference(x,y,x1,y1,robot.x(),robot.y(),200) && distance(x,robot.x(),y,robot.y()) < R && inTheWay(x,x1,robot.x(),y,y1,robot.y(),false)){
+		if(!(yellow && id==i)){
+		if(id == 1){
+			inTheWay(x,x1,robot.x(),y,y1,robot.y(),true);
+			printf("InTheWay? %d, Intefere? %d",inTheWay(x,x1,robot.x(),y,y1,robot.y(),true),interference(x,y,x1,y1,robot.x(),robot.y(),200));}
+		if(interference(x,y,x1,y1,robot.x(),robot.y(),300) && distance(x,robot.x(),y,robot.y()) < R && inTheWay(x,x1,robot.x(),y,y1,robot.y(),false)){
 			float angle2 = atan2(y-robot.y(),x-robot.x());
 			angle2 += 1.5;
-			float xUp = 360*cos(angle2);
-			float yUp = 360*sin(angle2);
+			float xUp = 300*cos(angle2);
+			float yUp = 300*sin(angle2);
 			xUp = xUp + robot.x();
 			yUp = yUp + robot.y();
 			x2 = xUp;
@@ -156,12 +159,12 @@ void Robot::PathTo(float x1, float y1, float vel){
 	}
 	for(int i = 0; i < current->robots_blue_size(); i++){
 		SSL_DetectionRobot robot = current->robots_blue(i);
-		if(!yellow && id != i){
+		if(!(!yellow && id == i)){
 		if(interference(x,y,x1,y1,robot.x(),robot.y(),300) && distance(x,robot.x(),y,robot.y()) < R && inTheWay(x,x1,robot.x(),y,y1,robot.y(),false)){
 			float angle2 = atan2(y-robot.y(),x-robot.x());
 			angle2 += 1.5;
-			float xUp = 360*cos(angle2);
-			float yUp = 360*sin(angle2);
+			float xUp = 300*cos(angle2);
+			float yUp = 300*sin(angle2);
 			xUp = xUp + robot.x();
 			yUp = yUp + robot.y();
 			x2 = xUp;
@@ -171,13 +174,11 @@ void Robot::PathTo(float x1, float y1, float vel){
 		}}
 	}
 	SSL_DetectionBall ball = current->balls(0);
-	if(interference(x,y,x1,y1,ball.x(),ball.y(),200) && distance(x,ball.x(),y,ball.y()) < R && inTheWay(x,x1,ball.x(),y,y1,ball.y(),true)){
+	if(interference(x,y,x1,y1,ball.x(),ball.y(),150) && distance(x,ball.x(),y,ball.y()) < R && inTheWay(x,x1,ball.x(),y,y1,ball.y(),true)){
 			float angle2 = atan2(y-ball.y(),x-ball.x());
-			if(angle2 < 0)
-				angle2 += 2*PI;
 			angle2 += 1.5;
-			float xUp = 360*cos(angle2);
-			float yUp = 360*sin(angle2);
+			float xUp = 200*cos(angle2);
+			float yUp = 200*sin(angle2);
 			xUp = xUp + ball.x();
 			yUp = yUp + ball.y();
 			x2 = xUp;
@@ -185,7 +186,7 @@ void Robot::PathTo(float x1, float y1, float vel){
 			R  = distance(x,ball.x(),y,ball.y());
 			printf("\nBall is in the WAY!!!");
 		}
-	printf("InTheWay? %d, Intefere? %d",inTheWay(x,x1,ball.x(),y,y1,ball.y(),true),interference(x,y,x1,y1,ball.x(),ball.y(),300));
+	//printf("InTheWay? %d, Intefere? %d",inTheWay(x,x1,ball.x(),y,y1,ball.y(),true),interference(x,y,x1,y1,ball.x(),ball.y(),300));
 	}
 	Move(x2,y2,vel);
 	printf("\nX2 is %f, Y2 is %f",x2,y2);
@@ -342,15 +343,15 @@ void Robot::Prepare(float x1, float y1,float vel, float x2, float y2){
 		velA = 0;
 		Kick(5);
 		printf("\nTIME TO SHOOT");
-		usleep(800*1000);
+		usleep(500*1000);
 		velT = 0;
 	}
 	if(velT != 5){
 		Rotate(angle);
 		printf("\nnewX is %f, newY is %f",new_x,new_y);
 		if(R > 50)
-		PathTo(new_x,new_y,1);
-		else Move(new_x,new_y,1);
+		PathTo(new_x,new_y,vel);
+		else Move(new_x,new_y,vel);
 	}
 
 		
