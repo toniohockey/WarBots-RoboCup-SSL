@@ -181,15 +181,15 @@ void* SocketHandler(void* lp){
     	float z = ball.z();
     	printf("x: %f, y: %f, z: %f",x,y,z);
     }
-    for(int i = 0; i < packet.detection().robots_yellow_size(); i++){
+    for(int i = 0; i < packet.detection().robots_blue_size(); i++){
 	SSL_DetectionRobot packetR;
-	packetR = packet.detection().robots_yellow(i);
+	packetR = packet.detection().robots_blue(i);
 	float x = packetR.x();
 	float y = packetR.y();
 	float orientation = packetR.orientation();
 	printf("\nRobot id %d, x: %f, y: %f, orientation: %f",i,x,y,orientation);
     }
-
+	
 	if(ball.x() > 3000 || ball.x() < -3000 || ball.y() > 2000 || ball.y() < -2000){
 		sleep(3);
 		if(ball.x() > 3000 || ball.x() < -3000 || ball.y() > 2000 || ball.y() < -2000){
@@ -202,12 +202,12 @@ void* SocketHandler(void* lp){
 		Ybots[i]->Update(&packetFrame);
 		Bbots[i]->Update(&packetFrame);
 	}
-
-	for(int i = 0; i < 4; i++){
-		Ybots[i]->Teleport(10,10);
-		Bbots[i]->Teleport(10,10);
+	
+	for(int i = 4; i < 4; i++){
+		Ybots[i]->Teleport(10+i,10+1);
+		Bbots[i]->Teleport(10,10+i);
 	}
-
+	
 	//Ybots[4].Move(1000,1000,1);
 	//Ybots[4].Rotate(1.57);
 	printf("\nCount is %d",count++);
@@ -215,12 +215,13 @@ void* SocketHandler(void* lp){
 
 	
 	
-	Bbots[4]->Prepare(ball.x(),ball.y(),1,3025,0);
+	Bbots[4]->Prepare(ball.x(),ball.y(),3,3025,0);
+	//Bbots[4]->PathTo(ball.x(),ball.y(),1);
 	Ybots[4] = new Goalie(4,true);
 	static_cast<Goalie*>(Ybots[4])->Update(&packetFrame);
 	static_cast<Goalie*>(Ybots[4])->Defend(ball.x(),ball.y());
 	//static_cast<Goalie>(Bbots[4]).Defend( ball.x(), ball.y());
-
+	
 
 
 
