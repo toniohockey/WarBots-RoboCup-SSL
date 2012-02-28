@@ -33,6 +33,9 @@ Robot* Bbots [5];
 int count = 0;
 bool ready = true;
 
+float distance(float x1, float y1, float x2, float y2){
+	return sqrt(pow(x1-x2,2)+pow(y1-y2,2));
+}
 
 void centerBall(){
 	grSim_Packet packet;	
@@ -66,7 +69,8 @@ int main(int argv, char** argc){
 	for(int i = 0; i < 5; i++){
 		Ybots[i] = new Robot(i, true);
 		Bbots[i] = new Robot(i, false);
-	}	
+	}
+	Ybots[4] = new Goalie(4,true);
 	ready = false;
 
     int host_port= 30015;
@@ -187,7 +191,7 @@ void* SocketHandler(void* lp){
 	float x = packetR.x();
 	float y = packetR.y();
 	float orientation = packetR.orientation();
-	printf("\nRobot id %d, x: %f, y: %f, orientation: %f",i,x,y,orientation);
+	printf("\nRobot B id %d, x: %f, y: %f, orientation: %f",i,x,y,orientation);
     }
 	
 	if(ball.x() > 3000 || ball.x() < -3000 || ball.y() > 2000 || ball.y() < -2000){
@@ -202,11 +206,11 @@ void* SocketHandler(void* lp){
 	float x = packetR.x();
 	float y = packetR.y();
 	float orientation = packetR.orientation();
-	printf("\nRobot id %d, x: %f, y: %f, orientation: %f",i,x,y,orientation);
+	printf("\nRobot Y id %d, x: %f, y: %f, orientation: %f",i,x,y,orientation);
     }
 	
 	if(ball.x() > 3000 || ball.x() < -3000 || ball.y() > 2000 || ball.y() < -2000){
-		sleep(3);
+		sleep(1);
 		if(ball.x() > 3000 || ball.x() < -3000 || ball.y() > 2000 || ball.y() < -2000){
 			centerBall();
 		}
@@ -219,10 +223,14 @@ void* SocketHandler(void* lp){
 		Bbots[i]->Update(&packetFrame);
 	}
 	
-	for(int i = 4; i < 4; i++){
-		Ybots[i]->Teleport(10+i,10+1);
+	for(int i = 0; i < 3; i++){
+		//Ybots[i]->Teleport(10+i,10+1);
 		Bbots[i]->Teleport(10,10+i);
 	}
+	Ybots[0]->Teleport(2,-1);
+	Ybots[1]->Teleport(1,-0.5);
+	Ybots[2]->Teleport(1,0.5);
+	Ybots[3]->Teleport(2,1);
 	
 	//Ybots[4].Move(1000,1000,1);
 	//Ybots[4].Rotate(1.57);
@@ -230,40 +238,66 @@ void* SocketHandler(void* lp){
 	//Ybots[4].Kick(5);
 
 	
+	//role assignment
+	Robot* shooterBot = NULL;
+	Robot* passerBot = NULL;
+/*
+	if(Bbots[4]->x < Bbots[3]->x){
+		Bbots[4]->shooter = false;
+		Bbots[3]->shooter = true;
+		shooterBot = Bbots[3];
+		passerBot = Bbots[4];
+	}
+	else{
+		Bbots[4]->shooter = true;
+		Bbots[3]->shooter = false;
+		shooterBot = Bbots[4];
+		passerBot = Bbots[3];
+	}
+*/
+//Bbots[3]->PathTo(1500,200,1.5);
+//Bbots[4]->Prepare(ball.x(),ball.y(),1.5,5,3025,0);
+
+		//testing with fixed roles
+		Bbots[3]->shooter = true;
+		Bbots[4]->shooter = false;
+		shooterBot = Bbots[3];
+		passerBot = Bbots[4];
 	
-	Bbots[4]->Prepare(ball.x(),ball.y(),1.5,3025,0);
-	//Bbots[4]->PathTo(ball.x(),ball.y(),1);
-	Ybots[4] = new Goalie(4,true);
+		if(distance(ball.x(),ball.y(),shooterBot->x,shooterBot->y) > 600){
+			passerBot->Pass(shooterBot->id,shooterBot->yellow,1.5);
+			shooterBot->PathTo(1500,200,1.5);
+			shooterBot->velA = 0;
+		}
+		else{
+			shooterBot->Prepare(ball.x(),ball.y(),1.5,5,3025,0);
+			passerBot->Stop();
+		}
+/*
+	if(distance(shooterBot->x, shooterBot->y, ball.x(), ball.y()) <=
+		distance(passerBot->x, passerBot->y, ball.x(), ball.y()) ){
+
+		//passer closer to ball, pass and shoot
+		passerBot->Prepare(ball.x(), ball.y(), 1.5, 8, shooterBot->x, shooterBot->y);
+		shooterBot->Stop();
+	}
+	else{
+		//shooter closer to ball, just shoot
+		shooterBot->Prepare(ball.x(), ball.y(), 1.5, 8, 3025, 0);
+		passerBot->Stop();
+	}
+	*/
+	
+	//Bbots[4]->Prepare(ball.x(), ball.y(), 1.5, 8, 3025, 0);
+	//Bbots[3]->Prepare(ball.x(), ball.y(), 1.5, 8, 3025, 0);
+
 	static_cast<Goalie*>(Ybots[4])->Update(&packetFrame);
 	static_cast<Goalie*>(Ybots[4])->Defend(ball.x(),ball.y());
-	//static_cast<Goalie>(Bbots[4]).Defend( ball.x(), ball.y());
 	
-
-
-
-	//start1v1();
-/*	
-if(packetBall.x() > -3000 && packetBall.x() < 3000 && packetBall.y() > -2000 && packetBall.y() < 2000)
-		scoring(&packetFrame);
-	else
-		chaseBall(&packetFrame);
-
-	goalie(&packetFrame);
-*/
 
 	
 	
 	close(*csock);
-	/*    
-	strcat(buffer, " SERVER ECHO");
-
-    if((bytecount = send(*csock, buffer, strlen(buffer), 0))== -1){
-        fprintf(stderr, "Error sending data %d\n", errno);
-        goto FINISH;
-    }
-    
-    printf("Sent bytes %d\n", bytecount);
-	*/
 
 
 FINISH:

@@ -10,6 +10,7 @@ class Robot {
 	public:
 		float x,y,orientation,velT,velA,velN,velK;
 		bool yellow;
+		bool shooter;
 		int id;
 	public:
 		Robot();
@@ -20,8 +21,10 @@ class Robot {
 		void Move(float angle, float vel);
 		void PathTo(float x1, float y1, float vel);
 		void Teleport(float x1, float y1);
+		void Stop();
 		void Rotate(float angle);
-		void Prepare(float x1, float y1, float vel, float x2, float y2);
+		void Pass(int Rid, bool ISyellow, float vel);
+		void Prepare(float x1, float y1, float vel, float velK, float x2, float y2);
 		//void ChaseBall(float x1, float y1, float vel);
 	protected:
 		void sendPacket(grSim_Packet packet);

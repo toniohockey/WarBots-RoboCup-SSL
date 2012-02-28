@@ -41,6 +41,7 @@ Robot::Robot(int id_in, bool yellow_in){
 	y = 0;
 	velK = 0;
 	current = NULL;
+	shooter = true;
 }
 
 void Robot::Move(float angle, float vel){
@@ -70,12 +71,14 @@ void Robot::Move(float angle, float vel){
 }
 
 void Robot::Move(float x1, float y1, float vel){
-	
+	printf("entered MoveTo %d", id);
 	
 	float yDiff= y1-y;
 	float xDiff= x1-x;
 	float angle = 9999999;
 	float R = sqrt((yDiff*yDiff)+(xDiff*xDiff));
+
+
 	
 	if(R > 25){
 		angle = acos(xDiff/R);
@@ -124,52 +127,53 @@ void Robot::Move(float x1, float y1, float vel){
     command->set_spinner(true);
 
 	sendPacket(packet);
+	printf("EXITED MOVETO %d", id);
 			
 }
 void Robot::PathTo(float x1, float y1, float vel){
-	float m = (y-y1)/(x-x1);
-	float p = -(1.0/m);
-	float a = m;
-	float b = -1.0;
-	float c = -(m*x1+y1);
+
+	printf("\nentered pathto %d",id);
 	float R = sqrt(pow(x-x1,2)+pow(y-y1,2));
 	float x2 = x1;
 	float y2 = y1;
-	printf("\nA is %f, B is %f, C is %f, R is %f",a,b,c,R);
+	//printf("\nA is %f, B is %f, C is %f, R is %f",a,b,c,R);
 	//printf("In the way is %d, Interference is %d",inTheWay(x,x1,-1000,y,y1,-0.001,true),interference(a,b,c,-0.001,-1000,200));
-	if(R > 0){
+
+
+
+	if(R > 0 && 0< current->robots_yellow_size()  && 0 < current->robots_blue_size()){
 	for(int i = 0; i < current->robots_yellow_size(); i++){
-		SSL_DetectionRobot robot = current->robots_yellow(i);
+		SSL_DetectionRobot *robot = const_cast<SSL_DetectionRobot*>(&(current->robots_yellow(i)));
 		if(!(yellow && id==i)){
 		if(id == 1){
-			inTheWay(x,x1,robot.x(),y,y1,robot.y(),true);
-			printf("InTheWay? %d, Intefere? %d",inTheWay(x,x1,robot.x(),y,y1,robot.y(),true),interference(x,y,x1,y1,robot.x(),robot.y(),200));}
-		if(interference(x,y,x1,y1,robot.x(),robot.y(),300) && distance(x,robot.x(),y,robot.y()) < R && inTheWay(x,x1,robot.x(),y,y1,robot.y(),false)){
-			float angle2 = atan2(y-robot.y(),x-robot.x());
+			inTheWay(x,x1,robot->x(),y,y1,robot->y(),true);
+			printf("InTheWay? %d, Intefere? %d",inTheWay(x,x1,robot->x(),y,y1,robot->y(),true),interference(x,y,x1,y1,robot->x(),robot->y(),200));}
+		if(interference(x,y,x1,y1,robot->x(),robot->y(),300) && distance(x,robot->x(),y,robot->y()) < R && inTheWay(x,x1,robot->x(),y,y1,robot->y(),false)){
+			float angle2 = atan2(y-robot->y(),x-robot->x());
 			angle2 += 1.5;
 			float xUp = 300*cos(angle2);
 			float yUp = 300*sin(angle2);
-			xUp = xUp + robot.x();
-			yUp = yUp + robot.y();
+			xUp = xUp + robot->x();
+			yUp = yUp + robot->y();
 			x2 = xUp;
 			y2 = yUp;
-			R = distance(x,robot.x(),y,robot.y());
+			R = distance(x,robot->x(),y,robot->y());
 			printf("\nRobot %d in yellow is in the Way!!",i);
 		}}
 	}
 	for(int i = 0; i < current->robots_blue_size(); i++){
-		SSL_DetectionRobot robot = current->robots_blue(i);
+		SSL_DetectionRobot * robot = const_cast<SSL_DetectionRobot*>(&current->robots_blue(i));
 		if(!(!yellow && id == i)){
-		if(interference(x,y,x1,y1,robot.x(),robot.y(),300) && distance(x,robot.x(),y,robot.y()) < R && inTheWay(x,x1,robot.x(),y,y1,robot.y(),false)){
-			float angle2 = atan2(y-robot.y(),x-robot.x());
+		if(interference(x,y,x1,y1,robot->x(),robot->y(),300) && distance(x,robot->x(),y,robot->y()) < R && inTheWay(x,x1,robot->x(),y,y1,robot->y(),false)){
+			float angle2 = atan2(y-robot->y(),x-robot->x());
 			angle2 += 1.5;
 			float xUp = 300*cos(angle2);
 			float yUp = 300*sin(angle2);
-			xUp = xUp + robot.x();
-			yUp = yUp + robot.y();
+			xUp = xUp + robot->x();
+			yUp = yUp + robot->y();
 			x2 = xUp;
 			y2 = yUp;
-			R  = distance(x,robot.x(),y,robot.y());
+			R  = distance(x,robot->x(),y,robot->y());
 			printf("\nRobot %d in blue is in the Way!!",i);
 		}}
 	}
@@ -190,6 +194,7 @@ void Robot::PathTo(float x1, float y1, float vel){
 	}
 	Move(x2,y2,vel);
 	printf("\nX2 is %f, Y2 is %f",x2,y2);
+	printf("Exited PATHTO!! %d",id);
 }
 			
 void Robot::Update(SSL_DetectionFrame* frame){
@@ -245,6 +250,29 @@ void Robot::Teleport(float x1, float y1){
 
 	sendPacket(packet);
 }
+
+void Robot::Stop(){
+
+	grSim_Packet packet;	
+	packet.mutable_commands()->set_isteamyellow(yellow);
+    packet.mutable_commands()->set_timestamp(0.0);
+	grSim_Robot_Command* command = packet.mutable_commands()->add_robot_commands();
+	command->set_id(id);
+	command->set_wheelsspeed(false);
+    command->set_wheel1(0);
+    command->set_wheel2(0);
+    command->set_wheel3(0);
+    command->set_wheel4(0);
+    command->set_veltangent(0);
+    command->set_velnormal(0);
+    command->set_velangular(0);
+    command->set_kickspeedx(0);
+    command->set_kickspeedz(0);
+    command->set_spinner(true);
+
+	sendPacket(packet);
+}
+
 void Robot::Rotate(float angle){
 	if(orientation != angle){
 		float dir = 1;
@@ -295,36 +323,42 @@ void Robot::sendPacket(grSim_Packet packet){
 
 }
 
-void Robot::Prepare(float x1, float y1,float vel, float x2, float y2){
+void Robot::Pass(int Rid, bool ISyellow, float vel){
+	//call prepare to aim at/in front of shooter
+	SSL_DetectionBall ball = current->balls(0);
+	SSL_DetectionRobot robot;
+	if(ISyellow){
+		robot = current->robots_yellow(Rid);
+	}
+	else{
+		robot = current->robots_blue(Rid);
+	}
+	float R = distance(robot.x(),robot.y(),x,y);
+	float velocityK = R/1500;
+	Prepare(ball.x(),ball.y(),vel,velocityK+vel,robot.x(),robot.y());
+}
+
+void Robot::Prepare(float x1, float y1, float vel, float velK, float x2, float y2){
+
+	printf("\nPreparing! IDID %d", id);
 
 	float yDiff= y1-y2;
 	float xDiff= x1-x2;
 	float angle = 9999999;
 	float R = sqrt((yDiff*yDiff)+(xDiff*xDiff));
-	printf("\nPreparing!");
-	/*
-	if(sqrt(pow(y1-y,2)) < 200 && x1 < x){
-		if(y1 > y){
-			Move(x,y-300,1);
-			usleep(1000*1000);
-		}
-		else{
-			Move(x,y+300,1);
-			usleep(1000*1000);
-		}
-	}
-	else if(sqrt(pow(x1-x,2)) < 200 && x1 < x){
-		Move(x-300,y-300,1);
-		usleep(1000*1000);
-	}
-	*/
+
+	float dist = R;
+	int standoffDist = (int)(dist/10.0);
+	
+	
+
 	if(R > 50){
 		angle = acos(-xDiff/R);
 		if(yDiff < 0)
 			angle = 2*PI - angle;
 	}
-	float new_xDiff = -(250)*cos(angle);
-	float new_yDiff = (250)*sin(angle);
+	float new_xDiff = -(standoffDist)*cos(angle);
+	float new_yDiff = (standoffDist)*sin(angle);
 
 	float new_x;
 	float new_y;
@@ -341,30 +375,22 @@ void Robot::Prepare(float x1, float y1,float vel, float x2, float y2){
 		velT = 5;
 		velN = 0;
 		velA = 0;
-		Kick(5);
+		Kick(velK);
 		printf("\nTIME TO SHOOT");
-		usleep(500*1000);
+		usleep(standoffDist*(5.0/4.0)*1000);	//time taken to move in for kick
+		velT = -5;
+		usleep(standoffDist*(1000.0/dist)*1000);	//time used to pull back / brake
 		velT = 0;
 	}
 	if(velT != 5){
 		Rotate(angle);
-		printf("\nnewX is %f, newY is %f",new_x,new_y);
-		if(R > 50)
+		printf("%d is WEIRD, %d is WEIRD", id, id);
+		
+		printf("\nnewX is %f, newY is %f + %d this is in Prepare",new_x,new_y,id);
 		PathTo(new_x,new_y,vel);
-		else Move(new_x,new_y,vel);
-	}
-
 		
-	/*
-	if(abs(new_x - x) < 50){
-		Move(x,new_y,1); 
-		Rotate(angle);
-	}
-	else{
-		Move(new_x,y, 1);
-	}*/
-	
-		
+	}	
+	printf("Exited Prepare! %d",id);	
 }
 
 float Robot::distance(float x1, float x2, float y1, float y2){
