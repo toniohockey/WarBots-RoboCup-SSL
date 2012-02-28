@@ -334,7 +334,7 @@ void Robot::Pass(int Rid, bool ISyellow, float vel){
 		robot = current->robots_blue(Rid);
 	}
 	float R = distance(robot.x(),robot.y(),x,y);
-	float velocityK = R/1500;
+	float velocityK = R/1000;
 	Prepare(ball.x(),ball.y(),vel,velocityK+vel,robot.x(),robot.y());
 }
 
