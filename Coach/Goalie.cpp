@@ -38,10 +38,10 @@ void Goalie::Defend(float x1, float y1){
 
 	Move(2800,0,1.2);
 	float y2 = ((y1)/(x1-3200))*(2900-x1) + y1;
-	
-	Kick(3.5);
+//	Kick(3.5);
 	float xDiff = x1 - 3000;
 	float yDiff = y1 - y2;
+	float angle1 = atan ( (x-x1) / (y-y1) );
 	float angle = atan (yDiff/xDiff);
 	if(xDiff < 0)
 		angle = PI + angle;
@@ -66,8 +66,12 @@ void Goalie::Defend(float x1, float y1){
 		}
 	}
 */
+	if( x <= 2400)
+	{
+		Move(2950,y2,1.5);
+	}
 		
-	if (y1 < 350 && y1 > -350 && velT != 3)
+	if (y1 <= 350 && y1 >= -350)
 	{
 		
 		//Move(2900,y2,1.5);
@@ -103,66 +107,88 @@ void Goalie::Defend(float x1, float y1){
 		{
 			if (y1 > 150)
 			{
-				Move(2950,y1-150,1);
+				Move(2800,y1-150,1);
 				Rotate(angle+0.2);
 			}
 	
 			else if (y1 < -150)
 			{		
-					Move(2950,y1+150,1);	
-					Rotate(angle-0.2);
+				Move(2800,y1+150,1);	
+				Rotate(angle-0.2);
 			}	
 		
-			else if (y1 <= 0 && y1 >= -150)
+			else if (y1 < 0 && y1 >= -150)
 			{
-				Move(2950,y1+50,1);
+				Move(2800,y1+50,1);
 				Rotate(angle-0.2);
 			}
 
 			else if (y1 > 0 && y1 <= 150)
 			{
-				Move(2950,y1-50,1); 
+				Move(2800,y1-50,1); 
 				Rotate(angle+0.2);
+			}
+			
+			else if (y1 == 0)		
+			{
+				Move(2800,y1,1);
+				Rotate(PI);
 			}		
-
-		
 		}
 	
-		else if (x1 >= 2400 && x1 <= 3000){
-			if (y1 > 0)
+		else if (x1 >= 2400 && x1 <= 3000  && velK==0){
+			
+//			Kick(3.0);
+			if (y1 > 100)
 			{
-				Move(2950,y1,0.75);
+				Move(2950,y1+50,0.75);
 				Rotate(angle+0.5);
 
 			}
 	
+			
+			else if (y1< 100 && y1 >= 0)
+			{	
+				Move(2950,y1+25,0.75);
+				Rotate(angle+0.25);
+		
+			}
+
+			else if (y1 < 0 && y1 > -100)
+			{
+				Move(2950,y1-25,0.75);
+				Rotate(angle-0.25);
+			}
+
 			else
 			{
-				Move(2950,y1,0.75);
-				Rotate(angle-0.3);
+				Move(2950,y1-50,0.75);
+				Rotate(angle-0.5);
 
 			}
-			
-		}
-			
 
-		if(sqrt(pow(angle-orientation,2)) < .05){
-		
-		velT = 1;
-		velN = 0;
-		velA = 0;
-		Kick(3);
-		usleep(500*1000);
-		velT = 0;
 		}
-			
-
-		
+	
+		if ( x >= 2400 && x <= 2950 && sqrt(pow((y-y1),2)) <= 50){
+					
+			Kick(3.0);
+			while (x1 >= 2400 && x1 <= 2950 && x >= 2400)		
+			{
+				velT = 3;
+				velN = 0;
+				velA = 0;
+				Kick(3);
+				usleep(500*1000);	
+			}
+			velT = 0;
+			Kick(0.0);
+		}
+	
 
 	}
 
 	
-	if (y1 > 350 || y1 < -350 && velT != 3)
+	if (y1 > 350 || y1 < -350)
 	{
 		if (x1 < 2000)
 		{
@@ -172,7 +198,7 @@ void Goalie::Defend(float x1, float y1){
 				Rotate(PI+0.2);
 			}
 		
-			else if ( y1 <= -350)
+			else if ( y1 < -350)
 			{
 				Move (2650,y2-100,0.75);
 				Rotate(PI-0.2);
@@ -183,47 +209,132 @@ void Goalie::Defend(float x1, float y1){
 		{
 			if ( y1 > 350 )
 			{
-				Move (2750,y2,0.75);
+				Move (2850,y2,0.75);
 				Rotate(PI+0.2);
 			}
 		
-			else if ( y1 <= -350)
+			else if ( y1 < -350)
 			{
-				Move (2750,y2,0.75);
+				Move (2850,y2,0.75);
 				Rotate(PI-0.2);
 			}
 	
 		}
+
+		
 		
 		else if (x1 >= 2400 && x1 < 3000)
 		{
+	
+				if (y1 >= 450)
+				{
+					if (x1 >= 2650)
+					{ 
+						Move(2950,275,0.75);
+						Rotate(PI- 0.5);
+					}
 			
+					else if (x1 < 2650)
+					{
+						Move(2800,y2,0.75);
+						Rotate (PI + 0.3);
+					}
+
+				}
+	
+				else if (y1 <= -450)
+				{
+					if (x1 >= 2500)
+					{ 
+						Move(2950,-275,0.75);
+						Rotate(PI + 0.5);
+					}
+		
+					else if(x1 < 2500)
+					{
+						Move(2800, y2,0.75);
+						Rotate(PI + 0.5);
+					}
+			
+
+				}
+			
+				else if (y1< 450)
+				{	
+					Move(2800,y2+25,0.75);
+					Rotate(angle+0.25);
+		
+				}
+
+				else if (y1 > -450)
+				{
+					Move(2800,y1-25,0.75);
+					Rotate(angle-0.25);
+				}
+
+			
+	
+			if ( x >= 2400 && x <= 2950 && sqrt(pow((y-y1),2)) <= 50){
+					
+				Kick(3.0);
+				while (x1 >= 2400 && x1 <= 2950 && x >= 2400)		
+				{
+					velT = 3;
+					velN = 0;
+					velA = 0;
+					Kick(3);
+					usleep(500*1000);	
+				}
+				velT = 0;
+				Kick(0.0);
+			}
+
+//			Kick(3);			
+/*
 			if (y1 < -350 && x1 >= 2650)
 			{ 
 				Move(2950,-275,0.75);
-				Rotate(PI + 0.7);
+				Rotate(PI + 0.5);
 			}
-			
+		
 			else if(y1 < -350 && x1 < 2650)
 			{
-				Move(2900, y2,0.75);
-				Rotate(PI + 0.7);
+				Move(2800, y2,0.75);
+				Rotate(PI + 0.5);
 			}
+
 		
 			else if (y1 > 350 && x1 >= 2650)
 			{ 
 				Move(2950,275,0.75);
 				Rotate(PI- 0.4);
 			}
+
 			
 			else if (y1 > 350 && x1 < 2650)
 			{
-				Move(2900,y2,0.75);
+				Move(2800,y2,0.75);
 				Rotate (PI + 0.3);
 			}
-		
+*/
 		}
-	
+		
+		if (y1 >= -450 || y1 <= 450){
+			if ( x >= 2400 && x <= 2950 && sqrt(pow((y-y1),2)) <= 100){
+					
+				Kick(3.0);
+				while (x1 >= 2400 && x1 <= 2950 && x >= 2400)		
+				{
+					velT = 3;
+					velN = 0;
+					velA = 0;
+					Kick(3);
+					usleep(500*1000);	
+				}
+				velT = 0;
+				Kick(0.0);
+			}
+		}
 	} 
 
 
