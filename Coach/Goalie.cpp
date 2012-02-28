@@ -127,27 +127,31 @@ void Goalie::Defend(float x1, float y1){
 			{
 				Move(2950,y1,0.75);
 				Rotate(angle+0.5);
+
 			}
 	
 			else
 			{
 				Move(2950,y1,0.75);
 				Rotate(angle-0.3);
+
 			}
 			
-			while (x1 >= 2400 && x1 <= 3000)
-			{
-				if(sqrt(pow(angle-orientation,2)) < .005){
-		
-				velT = 1;
-				velN = 0;
-				velA = 0;
-				Kick(3);
-				usleep(500*1000);
-				velT = 0;
-				}
-			}
 		}
+			
+
+		if(sqrt(pow(angle-orientation,2)) < .05){
+		
+		velT = 1;
+		velN = 0;
+		velA = 0;
+		Kick(3);
+		usleep(500*1000);
+		velT = 0;
+		}
+			
+
+		
 
 	}
 
