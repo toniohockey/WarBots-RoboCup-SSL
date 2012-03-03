@@ -285,7 +285,7 @@ void Robot::Rotate(float angle){
 			dir = -1;
 		if(checkAngle > PI)
 			checkAngle -= PI;
-		velA = dir * (5.0 * (checkAngle/PI));
+		velA = dir * (7.50 * (checkAngle/PI));
 	}
 	else{
 		velA = 0;
@@ -334,7 +334,7 @@ void Robot::Pass(int Rid, bool ISyellow, float vel){
 		robot = current->robots_blue(Rid);
 	}
 	float R = distance(robot.x(),robot.y(),x,y);
-	float velocityK = R/1000;
+	float velocityK = R/1500;
 	Prepare(ball.x(),ball.y(),vel,velocityK+vel,robot.x(),robot.y());
 }
 
@@ -370,7 +370,7 @@ void Robot::Prepare(float x1, float y1, float vel, float velK, float x2, float y
 
 	R = sqrt(pow((x - new_x),2)+pow((y-new_y),2));
 
-	if(sqrt(pow(diff,2)) < 0.05 && velT == 0 && velN == 0 && sqrt(pow(velA,2)) < 0.05)
+	if(sqrt(pow(diff,2)) < 0.05 && velT == 0 && velN == 0)
 	{
 		velT = 5;
 		velN = 0;

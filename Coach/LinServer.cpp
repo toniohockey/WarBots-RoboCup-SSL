@@ -195,10 +195,11 @@ void* SocketHandler(void* lp){
     }
 	
 	if(ball.x() > 3000 || ball.x() < -3000 || ball.y() > 2000 || ball.y() < -2000){
-		sleep(3);
-		if(ball.x() > 3000 || ball.x() < -3000 || ball.y() > 2000 || ball.y() < -2000){
+		//sleep(3);
+		usleep(500*1000);
+		//if(ball.x() > 3000 || ball.x() < -3000 || ball.y() > 2000 || ball.y() < -2000){
 			centerBall();
-		}
+		//}
 	}
 	for(int i = 0; i < packet.detection().robots_yellow_size(); i++){
 	SSL_DetectionRobot packetR;
@@ -210,9 +211,9 @@ void* SocketHandler(void* lp){
     }
 	
 	if(ball.x() > 3000 || ball.x() < -3000 || ball.y() > 2000 || ball.y() < -2000){
-		sleep(1);
+		//sleep(1);
 		if(ball.x() > 3000 || ball.x() < -3000 || ball.y() > 2000 || ball.y() < -2000){
-			centerBall();
+			//centerBall();
 		}
 	}
 
@@ -224,13 +225,18 @@ void* SocketHandler(void* lp){
 	}
 	
 	for(int i = 0; i < 3; i++){
-		//Ybots[i]->Teleport(10+i,10+1);
+		Ybots[i]->Teleport(10+i,10+1);
 		Bbots[i]->Teleport(10,10+i);
 	}
-	Ybots[0]->Teleport(2,-1);
-	Ybots[1]->Teleport(1,-0.5);
-	Ybots[2]->Teleport(1,0.5);
-	Ybots[3]->Teleport(2,1);
+	//Ybots[3]->Teleport(11,-12);
+	//Bbots[4]->Prepare(ball.x(),ball.y(),1.5,5,3025,0);
+	//if(ready){
+	//Ybots[0]->Teleport(2,-1);
+	//Ybots[1]->Teleport(1,-0.5);
+	//Ybots[2]->Teleport(1,0.5);
+	//Ybots[3]->Teleport(2,1);
+	//ready = false;
+	//}
 	
 	//Ybots[4].Move(1000,1000,1);
 	//Ybots[4].Rotate(1.57);
@@ -239,10 +245,12 @@ void* SocketHandler(void* lp){
 
 	
 	//role assignment
-	Robot* shooterBot = NULL;
-	Robot* passerBot = NULL;
-/*
-	if(Bbots[4]->x < Bbots[3]->x){
+	Robot* shooterBotB = NULL;
+	Robot* passerBotB = NULL;
+	Robot* shooterBotY = NULL;
+	Robot* passerBotY = NULL;
+
+	/*if(Bbots[4]->x < Bbots[3]->x){
 		Bbots[4]->shooter = false;
 		Bbots[3]->shooter = true;
 		shooterBot = Bbots[3];
@@ -253,53 +261,74 @@ void* SocketHandler(void* lp){
 		Bbots[3]->shooter = false;
 		shooterBot = Bbots[4];
 		passerBot = Bbots[3];
-	}
-*/
+	}*/
+
 //Bbots[3]->PathTo(1500,200,1.5);
 //Bbots[4]->Prepare(ball.x(),ball.y(),1.5,5,3025,0);
 
-		//testing with fixed roles
+		//bbots
 		if(Bbots[3]->x > Bbots[4]->x){
-		Bbots[3]->shooter = true;
-		Bbots[4]->shooter = false;
-		shooterBot = Bbots[3];
-		passerBot = Bbots[4];}
-		else{
-		Bbots[4]->shooter = true;
-		Bbots[3]->shooter = false;
-		shooterBot = Bbots[4];
-		passerBot = Bbots[3];}
-	
-		if(distance(ball.x(),ball.y(),shooterBot->x,shooterBot->y) > 600){
-			passerBot->Pass(shooterBot->id,shooterBot->yellow,1.5);
-			shooterBot->PathTo(1500,200,1.5);
-			shooterBot->velA = 0;
+			Bbots[3]->shooter = true;
+			Bbots[4]->shooter = false;
+			shooterBotB = Bbots[3];
+			passerBotB = Bbots[4];
 		}
 		else{
-			shooterBot->Prepare(ball.x(),ball.y(),1.5,5,3025,0);
-			passerBot->Stop();
+			Bbots[4]->shooter = true;
+			Bbots[3]->shooter = false;
+			shooterBotB = Bbots[4];
+			passerBotB = Bbots[3];
+		}
+		/*
+		//ybots
+		if(Ybots[3]->x < Ybots[4]->x){
+			Ybots[3]->shooter = true;
+			Ybots[4]->shooter = false;
+			shooterBotY = Ybots[3];
+			passerBotY = Ybots[4];
+		}
+		else{
+			Ybots[4]->shooter = true;
+			Ybots[3]->shooter = false;
+			shooterBotY = Ybots[4];
+			passerBotY = Ybots[3];
+		}
+*//*
+		if(distance(ball.x(),ball.y(),shooterBotB->x,shooterBotB->y) > 600){
+			passerBotB->Pass(shooterBotB->id,shooterBotB->yellow,1.5);
+			shooterBotB->PathTo(1500,200,1.5);
+			shooterBotB->velA = 0;
+		}
+		else{
+			shooterBotB->Prepare(ball.x(),ball.y(),1.5,5,3025,0);
+			passerBotB->Stop();
 		}
 /*
-	if(distance(shooterBot->x, shooterBot->y, ball.x(), ball.y()) <=
-		distance(passerBot->x, passerBot->y, ball.x(), ball.y()) ){
+		if(distance(ball.x(),ball.y(),shooterBotY->x,shooterBotY->y) > 600){
+			passerBotY->Pass(shooterBotY->id,shooterBotY->yellow,1.5);
+			shooterBotY->PathTo(-1500,-200,1.5);
+			shooterBotY->velA = 0;
+		}
+		else{
+			shooterBotY->Prepare(ball.x(),ball.y(),1.5,5,-3025,0);
+			passerBotY->Stop();
+		}
+*/
+	Ybots[3]->Prepare(ball.x(), ball.y(), 1.5, 8, -3025, 0);
+	Bbots[3]->Prepare(ball.x(), ball.y(), 1.5, 8, 3025, 0);
 
-		//passer closer to ball, pass and shoot
-		passerBot->Prepare(ball.x(), ball.y(), 1.5, 8, shooterBot->x, shooterBot->y);
-		shooterBot->Stop();
-	}
-	else{
-		//shooter closer to ball, just shoot
-		shooterBot->Prepare(ball.x(), ball.y(), 1.5, 8, 3025, 0);
-		passerBot->Stop();
-	}
-	*/
-	
-	//Bbots[4]->Prepare(ball.x(), ball.y(), 1.5, 8, 3025, 0);
-	//Bbots[3]->Prepare(ball.x(), ball.y(), 1.5, 8, 3025, 0);
+
+	//static_cast<Goalie*>(Ybots[4])->Update(&packetFrame);
+	//static_cast<Goalie*>(Ybots[4])->Defend(ball.x(),ball.y());
+
+
 
 	static_cast<Goalie*>(Ybots[4])->Update(&packetFrame);
 	static_cast<Goalie*>(Ybots[4])->Defend(ball.x(),ball.y());
-	
+
+	static_cast<Goalie*>(Bbots[4])->Update(&packetFrame);
+	static_cast<Goalie*>(Bbots[4])->Defend(ball.x(),ball.y());
+
 
 	
 	
