@@ -1,0 +1,12 @@
+#!/bin/bash
+
+originalDir="$(pwd)"
+
+
+make
+cd ../grSim/bin
+./grSim &
+cd $originalDir 
+./server_30015
+
+
