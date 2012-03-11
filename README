@@ -1,0 +1,13 @@
+WarBots RoboCup SSL Repository
+
+## please download gitignore
+## and then run `mv gitignore .gitignore`
+## this will stop you from adding temporary files when doing git add *
+	
+
+Members:
+Cong Wang (thePerv)
+Salar Ali Mumtaz (Zozos)
+Vincent Chau (Solontus)
+Lawrence Fu (ImpossibleGeese)
+Kyle Olive (kolive)
