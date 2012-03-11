@@ -6,12 +6,11 @@
 
 //abstract class
 class Role{
-    Robot *curBot;                      //pointer to the current robot
-    Role(Robot *curBot);                //constructor, has to have a robot assigned
+    Role();                //constructor, has to have a robot assigned
     
     //modifies the grSim packet within curBot with intended commands
     //this method should only modify the grSim packet, not send it
-    virtual void Run();
+    virtual void Run(Robot *curBot);
 };
 
 //a type of Role (defender)
@@ -23,7 +22,7 @@ class DefenderRole : public Role{
     //void *behavior;
         
     //Run should implement the behavior specified
-    void Run();
+    void Run(Robot *curBot);
 };
 
 #endif

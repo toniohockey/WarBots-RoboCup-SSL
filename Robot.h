@@ -18,7 +18,7 @@ class Robot{
     SSL_DetectionFrame *field;              //pointer, since the field status is universal
     
     //command to be executed
-    Role *role;                             //has built-in run function
+    Role *role;                             //built-in run fn (takes 'this' as parameter)
     Task *task;                             //higher priority than role
     
     //Robot info
