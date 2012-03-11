@@ -1,8 +1,7 @@
 WarBots RoboCup SSL Repository
 
-## please download gitignore
-## and then run `mv gitignore .gitignore`
-## this will stop you from adding temporary files when doing git add *
+## please download .gitignore
+## this will stop you from adding temporary files when doing git add *, or git add .
 	
 
 Members:
