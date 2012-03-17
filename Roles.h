@@ -6,7 +6,7 @@
 
 //abstract class
 class Role{
-    Role();                //constructor, has to have a robot assigned
+    Role();                //constructor
     
     //modifies the grSim packet within curBot with intended commands
     //this method should only modify the grSim packet, not send it
